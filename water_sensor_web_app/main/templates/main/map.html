@@ -19,8 +19,12 @@
     <div id="map"/>
 
     <script>
-        window.reservoirs = JSON.parse('{{ reservoirs | safe }}');
+        window.reservoirs     = JSON.parse('{{ reservoirs | safe }}');
+        window.reservoir_cons = JSON.parse('{{ reservoir_cons | safe }}');
+        window.pumps          = JSON.parse('{{ pumps | safe }}');
+        window.pump_cons      = JSON.parse('{{ pump_cons | safe }}');
         window.RESERVOIR_ICON = "{% static 'main/img/reservoir_icon.png' %}";
+        window.PUMP_ICON      = "{% static 'main/img/pump_icon.png %}";
     </script>
     <script src="{% static 'main/js/map.js' %}"></script>    
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_key }}&callback=loadMap"></script>

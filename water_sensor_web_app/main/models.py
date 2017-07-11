@@ -11,6 +11,7 @@ MAX_STR_SIZE = 256
 # defines the maximum size of a directory or file path
 MAX_PATH_SIZE = 500
 
+
 class Reservoir (models.Model) :
     """
     Water Reservoir
@@ -21,15 +22,7 @@ class Reservoir (models.Model) :
 
     # the id of the reservoir
     res_id    = models.AutoField(primary_key=True)
-    # the specific location of the reservoir
-    latitude  = models.FloatField()
-    longitude = models.FloatField()
-    # island where the reservoir is located
-    island    = models.CharField(max_length=MAX_STR_SIZE)
-    # county(concelho) where the reservoir is located
-    county  = models.CharField(max_length=MAX_STR_SIZE)
-    # the town where the reservoir is located
-    town      = models.CharField(max_length=MAX_STR_SIZE)
+    
     ## these define the dimensions of the reservoir
     heigth = models.FloatField() # meters
     width  = models.FloatField() # meters
@@ -141,6 +134,7 @@ class Measurement (models.Model) :
         # TODO: implement
         pass
     
+
 class Conection (models.Model) :
     """
     Represents a conecion between 2 reservoirs
@@ -158,6 +152,7 @@ class Conection (models.Model) :
     # the reservoirs that are connected
     reservoirA   = models.ForeignKey(Reservoir, related_name='A_con')
     reservoirB   = models.ForeignKey(Reservoir, related_name='B_con')
+
 
 class Pump (models.Model) :
     """

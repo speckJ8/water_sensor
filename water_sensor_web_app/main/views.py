@@ -84,24 +84,41 @@ def home (req) :
 @login_required(login_url='/login')
 def map (req) :
     """
-    Returns a page with a map with the locations of the reservoirs
+    Returns a page with a map with the locations of the reservoirs, pumps and the conections
     """
 
     template = loader.get_template('main/map.html')
     reservoirs = []
+    pumps      = []
     try:
-        res = Reservoir.objects.all()
+        res     = Reservoir.objects.all()
+        pmps   = Pump.objects.all()
+        resCon  = Conection.objects.all()
+        pumpCon = PumpConection.objects.all()
+
         for r in res :
             reservoirs.append({
+                'id': r.res_id,
                 'position': {'lat': r.latitude, 'lng': r.longitude},
                 'address': r.addressName()
             })
+
+        for p in pmps :
+            pumps.append({
+                'id': p.pump_id,
+                'position': {'lat': p.latitude, 'lng': p.longitude},
+                'address': p.addressName()
+            })
+
     except Exception as e:
         print("[map] couldn't get reservoir data: {}".format(e))
         
     data = {
         'google_maps_key': settings.GOOGLE_MAPS_KEY,
-        'reservoirs': json.dumps(reservoirs)
+        'reservoirs'     : json.dumps(reservoirs),
+        'pumps'          : json.dumps(pumps),
+        'reservoir_cons' : json.dumps(resCon),
+        'pump_cons'      : json.dumps(pumpCon),
     }
     return HttpResponse(template.render(data, req))
 
@@ -119,7 +136,8 @@ def reservoirList (req) :
         islands    = reservoirs.order_by().values_list('island', flat=True).distinct()
         counties   = reservoirs.order_by().values_list('county', flat=True).distinct()
         
-        for r in reservoirs : r.setTemplateValues()
+        for r in reservoirs :
+            r.setTemplateValues()
         
     except Exception as e:
         print("[reservoirList] couldn't get reservoir data: {}".format(e))
