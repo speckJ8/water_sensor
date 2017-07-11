@@ -1,6 +1,24 @@
 (() => {
 
-    var locationSantiagoIsland = {lat: 15.082677, lng: -23.6210796}
+    var locationSantiagoIsland = { lat: 15.082677, lng: -23.6210796 }
+
+    /**
+     * @param {integer} id the id of the reservoir to search
+     * @return {reservoir} the reservoir with the id, if found. undefined if not found
+     */
+    window.findReservoirById = (id) => {
+        var found = window.reservoirs.filter((r) => r.id == id);
+        return found.length != 0 ? found[0] : undefined;
+    }
+
+    /**
+     * @param {integer} id the id of the pump to search
+     * @return {pump} the pump with the id, if found. undefined if not found
+     */
+    window.findPumpById = (id) => {
+        var found = window.pumps.filter((r) => r.id == id);
+        return found.length != 0 ? found[0] : undefined;
+    }
 
     /**
      * will load the map into the html page and show
@@ -11,12 +29,29 @@
             zoom: 11,
             center: locationSantiagoIsland
         });
-        window.reservoirLocations = [];
-        window.pumpLocations      = [];
+
+        // add the pump and reservoir markers to the map
         for (var i = 0; i < window.reservoirs.length; i++)
             addReservoirToMap(window.reservoirs[i]);
         for (var i = 0; i < window.pumps.length; i++)
             addPumpToMap(window.pumps[i]);
+        
+        // add the connections between the reservoirs
+        for (var i = 0; i < window.reservoirCons.length; i++) {
+            var con = window.reservoirCons[i];
+            var a   = findReservoirById(con.reservoirA__res_id);
+            var b   = findReservoirById(con.reservoirB__res_id);
+            if (a !== undefined && b !== undefined)
+                addConnectionToMap(a.marker, b.marker, con.flowDirection);
+        }
+        // add the connections between the pumps and the reservoirs
+        for (var i = 0; i < window.pumpCons.length; i++) {
+            var con = window.pumpCons[i];
+            var res = findReservoirById(con.reservoir__res_id);
+            var pmp = findPumpById(con.pump__pump_id);
+            if (res !== undefined && pmp !== undefined)
+                addConnectionToMap(res.marker, pmp.marker, 1);            
+        }
     }
 
     /**
@@ -24,7 +59,7 @@
      * @param {object} reservoirData should contain the location and address name of the reservoir
      */
     window.addReservoirToMap = (reservoirData) => {
-        var marker = new google.maps.Marker({
+        reservoirData.marker = new google.maps.Marker({
             position: reservoirData.position,
             title: reservoirData.address,
             map: window.myMap,
@@ -33,7 +68,6 @@
                 scaledSize: new google.maps.Size(20, 20)
             }
         });
-        window.reservoirLocations.push(marker);
     }
 
     /**
@@ -41,7 +75,7 @@
      * @param {object} pumpData should contain the location and address name of the pump
      */
     window.addPumpToMap = (pumpData) => {
-        var marker = new google.maps.Marker({
+        pumpData.marker = new google.maps.Marker({
             position: pumpData.position,
             title: pumpData.address,
             map: window.myMap,
@@ -50,26 +84,61 @@
                 scaledSize: new google.maps.Size(20, 20)
             }
         });
-        window.pumpLocations.push(marker);
     }
 
     /**
      * Removes all current markers from the map
      */
     window.removeMarkers = () => {
-        var i = window.revervoirLocations.length;
+        var i = window.reservoirs.length;
         while (i-- >= 0) {
             // remove from map and from array
-            window.reservoirLocations[i].setMap(null);
-            window.reservoirLocations.splice(i, 1);
+            window.reservoirs[i].marker.setMap(null);
+            window.reservoirs.splice(i ,1);
         }
-        
-        i = window.pumpLocations.length;
+
+        i = window.pumps.length;
         while (i-- > 0) {
             // remove from map and from array
-            window.pumpLocations[i].setMap(null);
-            window.pumpLocations.splice(i, 1);
+            window.pumps[i].marker.setMap(null);
+            window.pumps.splice(i, 1);
         }
     }
-    
+
+    /**
+     * Add a line connecting two markers in the map
+     * @param {google.maps.Marker} a
+     * @param {google.maps.Marker} b
+     * @param {number} directionAtoB if positive the connection has an arrow from a to a
+     *                               if negative the connection has an arrow from b to a
+     *                               if it has now arrow
+     */
+    window.addConnectionToMap = (a, b, directionAtoB) => {
+        var line = new google.maps.Polyline({
+            path: [ a.position, b.position ],
+            geodesic: true,
+            strokeColor: '#24aebd',
+            strokeOpacity: 1,
+            strokeWeight: 1.5
+        });
+
+        if (directionAtoB > 0) {
+            line.setOptions({
+                icons: [{
+                    icon: { path: google.maps.SymbolPath.FORWARD_CLOSE_ARROW },
+                    offset: '0%',
+                    repeat: '20px'
+            }]});
+        } else if (directionAtoB < 0) {
+            line.setOptions({
+                icons: [{
+                    icon: { path: google.maps.SymbolPath.BACKWARD_CLOSE_ARROW },
+                    offset: '0%',
+                    repeat: '20px'
+            }]});
+        }
+
+        line.setMap(window.myMap);
+    }
+
 })();

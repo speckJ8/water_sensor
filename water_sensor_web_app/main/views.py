@@ -87,14 +87,19 @@ def map (req) :
     Returns a page with a map with the locations of the reservoirs, pumps and the conections
     """
 
-    template = loader.get_template('main/map.html')
-    reservoirs = []
-    pumps      = []
+    reservoirs    = []
+    pumps         = []
+    resCons       = []
+    pumpCons      = []
+
     try:
-        res     = Reservoir.objects.all()
-        pmps   = Pump.objects.all()
-        resCon  = Conection.objects.all()
-        pumpCon = PumpConection.objects.all()
+        res      = Reservoir.objects.all()
+        pmps     = Pump.objects.all()
+        pumpCons  = PumpConnection.objects.all().values(
+            'pipingLength', 'maxFlow', 'reservoir__res_id', 'pump__pump_id')
+        resCons = Connection.objects.all().values(
+            'pipingLength', 'maxFlow', 'flowDirection',
+            'con_id', 'reservoirA__res_id', 'reservoirB__res_id')
 
         for r in res :
             reservoirs.append({
@@ -102,24 +107,26 @@ def map (req) :
                 'position': {'lat': r.latitude, 'lng': r.longitude},
                 'address': r.addressName()
             })
-
         for p in pmps :
             pumps.append({
                 'id': p.pump_id,
                 'position': {'lat': p.latitude, 'lng': p.longitude},
                 'address': p.addressName()
             })
-
+        
+        
     except Exception as e:
-        print("[map] couldn't get reservoir data: {}".format(e))
+        print("[map] couldn't get data: {}".format(e))
         
     data = {
         'google_maps_key': settings.GOOGLE_MAPS_KEY,
         'reservoirs'     : json.dumps(reservoirs),
         'pumps'          : json.dumps(pumps),
-        'reservoir_cons' : json.dumps(resCon),
-        'pump_cons'      : json.dumps(pumpCon),
+        'reservoirCons'  : repr(resCons).replace("'", '"'), # change single quoting to double quoting
+        'pumpCons'       : repr(pumpCons).replace("'", '"') # change single quoting to double quoting
     }
+
+    template = loader.get_template('main/map.html')    
     return HttpResponse(template.render(data, req))
 
 @login_required(login_url='/login')

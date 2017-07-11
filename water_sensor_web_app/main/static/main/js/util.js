@@ -13,7 +13,7 @@ $(document).ready(() => {
      * to show error dialog
      * @param {string} msg error message to show
      */
-    window.showErrorDialog = (msg) => {
+    var showErrorDialog = (msg) => {
         document.getElementById('error-dialog-content').innerHTML = msg;
         errorDialog.showModal();
     }
@@ -23,7 +23,7 @@ $(document).ready(() => {
      * @param {string} title the title of the dialog
      * @param {string} msg the message to show
      */
-    window.showMsgDialog = (title, msg) => {
+    var showMsgDialog = (title, msg) => {
         document.getElementById('msg-dialog-title').innerHTML = title;        
         document.getElementById('msg-dialog-content').innerHTML = msg;
         msgDialog.showModal();
@@ -36,7 +36,7 @@ $(document).ready(() => {
      * @param {function} choiceOk the function to be called if user chooses 'Ok' button
      * @param {function} choiceCancel the function to be called if user chooses 'Cancelar' button
      */
-    window.showChoiceDialog = (title, msg, choiceOk, choiceCancel) => {
+    var showChoiceDialog = (title, msg, choiceOk, choiceCancel) => {
 
         document.getElementById('choice-dialog-title').innerHTML = title;
         document.getElementById('choice-dialog-content').innerHTML = title;
@@ -60,9 +60,31 @@ $(document).ready(() => {
      * to add the CSRF token to the post body
      * @param {Object} post the post data to add the CSRF token
      */
-    window.addCSRF = (post) => {
+    var addCSRF = (post) => {
         // var csrftoken = (document.getElementsByName('csrfmiddlewaretoken')[0]).value;
         var csrftoken = Cookies.get('csrftoken');
         post.csrfmiddlewaretoken = csrftoken;
+    }
+
+    /**
+     * Create an integer color given the red, blue and green components
+     * @param {number} red
+     * @param {number} green
+     * @param {number} blue
+     * @return {number} the color
+     */
+    var color = (red, green, blue) => {
+        var r = red & 255  ; r <<= 16;
+        var g = green & 255; g <<= 8;
+        var b = blue & 255   
+
+        return r | g | b;
+    }
+
+    window.Util = {
+        showErrorDialog: showErrorDialog,
+        showMsgDialog: showMsgDialog,
+        showChoiceDialog: showChoiceDialog,
+        addCSRF: addCSRF
     }
 })

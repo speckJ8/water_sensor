@@ -22,7 +22,15 @@ class Reservoir (models.Model) :
 
     # the id of the reservoir
     res_id    = models.AutoField(primary_key=True)
-    
+    # the specific location of the reservoir
+    latitude  = models.FloatField()
+    longitude = models.FloatField()
+    # island where the reservoir is located
+    island    = models.CharField(max_length=MAX_STR_SIZE)
+    # county(concelho) where the reservoir is located
+    county  = models.CharField(max_length=MAX_STR_SIZE)
+    # the town where the reservoir is located
+    town      = models.CharField(max_length=MAX_STR_SIZE)
     ## these define the dimensions of the reservoir
     heigth = models.FloatField() # meters
     width  = models.FloatField() # meters
@@ -135,13 +143,10 @@ class Measurement (models.Model) :
         pass
     
 
-class Conection (models.Model) :
+class Connection (models.Model) :
     """
-    Represents a conecion between 2 reservoirs
+    Represents a connection between 2 reservoirs
     """
-
-    # possible directons of water flow
-    FlowDirection = Enum('Direction', "A_to_B, B_to_A, bidirectional")
 
     # id of this object
     con_id       = models.AutoField(primary_key=True)
@@ -152,6 +157,8 @@ class Conection (models.Model) :
     # the reservoirs that are connected
     reservoirA   = models.ForeignKey(Reservoir, related_name='A_con')
     reservoirB   = models.ForeignKey(Reservoir, related_name='B_con')
+    # from a to b (if positive), b to a (if negative)  or bidirectional (if 0)
+    flowDirection = models.IntegerField()
 
 
 class Pump (models.Model) :
@@ -175,13 +182,20 @@ class Pump (models.Model) :
     # the town where the pump is located
     town      = models.CharField(max_length=MAX_STR_SIZE)
 
+    def addressName (self) :
+        """
+        Builds a printable address of the pump's location
+        """
 
-class PumpConection (models.Model) :
+        return "{}, {}, {}, @({}, {})".format(
+                self.town, self.county, self.island, self.latitude, self.longitude)
+
+class PumpConnection (models.Model) :
     """
-    Represents the conection between a pump and a reservoir
+    Represents the connection between a pump and a reservoir
     """
 
-    # id of this conection
+    # id of this connection
     pump_con_id  = models.AutoField(primary_key=True)
     # the length of the piping in the conexion
     pipingLength = models.FloatField() # meters
@@ -189,3 +203,5 @@ class PumpConection (models.Model) :
     maxFlow      = models.FloatField() # cubic meters / second
     # the reservoir that are connected
     reservoir    = models.ForeignKey(Reservoir)
+    # the pump that is the source of the connection
+    pump         = models.ForeignKey(Pump)

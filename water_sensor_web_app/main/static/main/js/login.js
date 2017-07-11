@@ -16,7 +16,7 @@ doLogin = () => {
     }
 
     // to add the CSRF token
-    addCSRF(data);
+    Util.addCSRF(data);
 
     $.post(DO_LOGIN_PATH, data)
     .done((result) => {
@@ -32,7 +32,8 @@ doLogin = () => {
                 passwordField.value = '';
                 usernameFieldWrapper.classList.add('is-invalid');
             } else if (jsonRes.err == 'password') {
-                // clear password field and show error in password field
+                // clear fields and show error in password field
+                usernameField.value = '';
                 passwordField.value = '';
                 passwordFieldWrapper.classList.add('is-invalid');
             }
@@ -41,7 +42,7 @@ doLogin = () => {
     })
     .fail(() => {
 
-        showErrorDialog('Erro de conexão');
+        Util.showErrorDialog('Erro de conexão');
 
     });
 }
