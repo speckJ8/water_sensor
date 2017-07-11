@@ -32,7 +32,6 @@ class Measurement () :
         self.salinity     = salinity
         self.tds          = tds
 
-    
     def __str__ (self) :
         return "reservoir={}, waterLevel={}, pH={}, conductivity={}, salinity={}, tds={}".format(
             self.reservoir, self.waterLevel, self.pH,
