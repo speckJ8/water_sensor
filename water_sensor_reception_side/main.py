@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 """
 This component should read the messages sent from the receiving device to the serial port.
 After receiving the message the data will be stored in the database. The Web App will
@@ -25,11 +27,22 @@ parser.add_argument('--baud_rate', help="The baud rate of the serial connection 
 
 def hexRepr (string) :
     """
-    Represents the hexadecimal representation of a byte string
+    Returns the hexadecimal representation of a byte string
     """
 
     return "0x" + "".join("{:02x}".format(b) for b in string)
 
+
+def bytesToNumber (bts) :
+    """
+    Converts a list of bytes to the integer they represent
+    """
+
+    value = 0
+    for i in range (0, len(bts)) :
+        value += bts[i] << (i*8)
+    
+    return value
 
 def getPacketComponents (packet) :
     """
@@ -40,12 +53,12 @@ def getPacketComponents (packet) :
 
     try :
         result = {
-            'reservoir'   : int(packet[0:2]),
-            'pH'          : int(packet[2:6]),
-            'waterLevel'  : int(packet[6:10]),
-            'conductivity': int(packet[10:14]),
-            'salinity'    : int(packet[14:18]),
-            'tds'         : int(packet[18:22]),
+            'reservoir'   : bytesToNumber(packet[0:2]),
+            'pH'          : bytesToNumber(packet[2:6]),
+            'waterLevel'  : bytesToNumber(packet[6:10]),
+            'conductivity': bytesToNumber(packet[10:14]),
+            'salinity'    : bytesToNumber(packet[14:18]),
+            'tds'         : bytesToNumber(packet[18:22]),
         }
     except Exception as e:
         print("[main#getPacketComponents] packet with invalid format received: {}".format(e))
@@ -64,15 +77,18 @@ if __name__ == '__main__' :
 
     print('App started...')
     
-    serialCon = serial.Serial(cmdArgs.port, cmdArgs.baud_rate)  
+    serialCon = serial.Serial(port=cmdArgs.port, baudrate=cmdArgs.baud_rate, xonxoff=True)
+    print('Connected to {}'.format(serialCon))  
     
     # read the serial port continuously        
-    while true :
+    while True :
         packet = serialCon.read(PACKET_LEN)
-        # split the packet into it's parts
+        print('[main] DEBUG: Read {}'.format(hexRepr(packet)))
+        # split the packet into its parts
         resultData = getPacketComponents(packet)
         if resultData is None :
-            print("[main] unable to save this measuremet. Read {}".format(hexRepr(packet)))
+            print('[main] unable to save this measuremet. Corrupted data')
         else :
-            measurement = Measuremet(**resultData)
+            measurement = Measurement(**resultData)
+            print('Measurement: {}'.format(measurement))
             # measurement.save()

@@ -34,8 +34,8 @@ class Measurement () :
 
     
     def __str__ (self) :
-        return "{}, {}, {}, {}, {}, {}".format(
-            self.reservoir, self.waterLevel, self.ph,
+        return "reservoir={}, waterLevel={}, pH={}, conductivity={}, salinity={}, tds={}".format(
+            self.reservoir, self.waterLevel, self.pH,
             self.conductivity, self.salinity, self.tds)
     
     def save (self) :
