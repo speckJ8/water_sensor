@@ -1,0 +1,16 @@
+water_sensor_web_app/static/css/ linguist-vendored
+water_sensor_web_app/static/css/styles_* linguist-vendored=false
+water_sensor_web_app/static/js/ linguist-vendored
+water_sensor_web_app/static/js/ws_* linguist-vendored=false
+water_sensor_wireless_comm/.config/ linguist-vendored
+water_sensor_wireless_comm/.launches/ linguist-vendored
+water_sensor_wireless_comm/.settings/ linguist-vendored
+water_sensor_wireless_comm/Debug/ linguist-vendored
+water_sensor_wireless_comm/easylink/ linguist-vendored
+water_sensor_wireless_comm/smartrf_settings/ linguist-vendored
+water_sensor_wireless_comm/src/ linguist-vendored
+water_sensor_wireless_comm/targetConfigs/ linguist-vendored
+water_sensor_wireless_comm/*.cmd linguist-vendored
+water_sensor_wireless_comm/*.defs linguist-vendored
+water_sensor_wireless_comm/*.cfg linguist-vendored
+water_sensor_wireless_comm/*.mak linguist-vendored
