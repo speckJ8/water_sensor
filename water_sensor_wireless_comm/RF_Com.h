@@ -18,14 +18,14 @@
 #define DEBUG_RF_COM
 
 /* main funcions */
-// To initialize the hardware. should be called before any send/receive operation
+/** To initialize the hardware. should be called before any send/receive operation */
 void RFCom_init ();
-/*
+/**
  * @param packet the data packet to send
  * @param packetSize the size, in bytes, of packet
  * */
 void RFCom_sendPacket (uint8_t *packet, UInt paketSize);
-/*
+/**
  * @param packetPtr pointer to a memory location where to put the data.
  *        The allocated size should be at least 128 bytes
  * @return nr of bytes returned. -1 if error
