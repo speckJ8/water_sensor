@@ -1,0 +1,49 @@
+header {
+    display: inline-flex;
+    width: 100%;
+    background: #505050;
+    height: 80px;
+}
+
+#reservoir-name {
+    margin-left: 10px;
+    color: white;
+}
+
+#reservoir-link-add-pic {
+    position: absolute;
+    top: 15px; right: 15px;
+    color: white;
+}
+
+#reservoir-link-add-pic i {
+    margin-bottom: 5px;
+} 
+
+
+#reservoir-info-section {
+    height: 350px;
+}
+
+#reservoir-info-list ul {
+    list-style: none;
+}
+
+#reservoir-info-list ul li {
+    font-family: Roboto;
+}
+
+.reservoir-info-val {
+    font-weight: bold;
+}
+
+.reservoir-info-no-data {
+    font: bold;
+    color: #ff3010;
+    font-size: 12pt;
+}
+
+#reservoir-animation {
+    width: 100%;
+    height: 100%;
+}

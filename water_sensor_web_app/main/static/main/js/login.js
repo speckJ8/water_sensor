@@ -1,6 +1,3 @@
-/**
- * takes the username and password entered and tries to login with the server
- */
 doLogin = () => {
 
     var usernameField = document.getElementById('username');

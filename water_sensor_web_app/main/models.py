@@ -38,6 +38,13 @@ class Reservoir (models.Model) :
     
     nrPics = models.IntegerField(default=0)
     
+
+    def lastMeasurement (self) :
+        try :
+            return Measurement.objects.filter(reservoir=self).latest('dateTime')
+        except Measurement.DoesNotExist :
+            return None
+
     def totalCapacity (self) :
         return self.heigth*self.width*self.length
         
@@ -47,18 +54,17 @@ class Reservoir (models.Model) :
         """
 
         # get the latest measurment related to this reservoir
-        try :
-            latestMeasurement = Measurement.objects.filter(reservoir=self).latest('dateTime')
-        except Measurement.DoesNotExist :
-            return 'No measurements'
+        lstMeas = self.lastMeasurement()
+        if lstMeas is None:
+            return -1
 
-        return abs(self.heigth - latestMeasurement.waterLevel)*self.width*self.length
+        return abs(self.heigth - lstMeas.waterLevel)*self.width*self.length
 
     def waterQuality (self) :
         """
         To calculate the current water quality
         """
-        pass
+        return 'Sem medições'
 
     def addressName (self) :
         """
@@ -75,7 +81,6 @@ class Reservoir (models.Model) :
         """
 
         mainPicName = Reservoir.RES_PICS_PATH + str(self.res_id) + '_0'
-        print("[mainPic] mainPicName =  {}".format(mainPicName))
         # if file exists return the file name
         if path.isfile(mainPicName) :
             return '/static/main/img/reservoir_pics/' + str(self.res_id) + '_0'
@@ -87,10 +92,11 @@ class Reservoir (models.Model) :
         Set the values to be used in a html page when this object is shown
         """
 
-        self.waterVolume_   = self.waterVolume()
-        self.mainPic_       = self.mainPic()
-        self.addressName_   = self.addressName()
-        self.totalCapacity_ = self.totalCapacity()
+        self.lastMeasurement_ = self.lastMeasurement()
+        self.waterVolume_     = self.waterVolume()
+        self.mainPic_         = self.mainPic()
+        self.addressName_     = self.addressName()
+        self.totalCapacity_   = self.totalCapacity()
 
 
 class FlowPoint (models.Model) :
@@ -134,6 +140,8 @@ class Measurement (models.Model) :
     salinity     = models.FloatField(default=-1)
     # total disolved solids in the water
     tds          = models.FloatField(default=-1)
+    # the number of the package corresponding to this measurement
+    packetNr     = models.IntegerField()
 
     def waterQuality (self) :
         """

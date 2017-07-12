@@ -13,7 +13,7 @@ import config
 
 from models import *
 
-PACKET_LEN = 22
+PACKET_LEN = 26
 
 # create command line arguments parser
 parser = argparse.ArgumentParser(
@@ -46,19 +46,21 @@ def bytesToNumber (bts) :
 
 def getPacketComponents (packet) :
     """
-    Split the packet(22 bytes) into it's components, according to the format:\n
-    | reservoir id (2 bytes) | pH (4 bytes) | water level (4 bytes) | conductivity (4 bytes) |
-    | salinity (4 bytes) | tds (4 bytes) |
+    Split the packet(26 bytes) into it's components, according to the format:\n
+    | packet no. (4 bytes) | reservoir id (2 bytes) | tds (4 bytes) | water level (4 bytes) |
+    | conductivity (4 bytes) | salinity (4 bytes) | pH (4 bytes) |
     """
 
     try :
         result = {
-            'reservoir'   : bytesToNumber(packet[0:2]),
-            'pH'          : bytesToNumber(packet[2:6]),
-            'waterLevel'  : bytesToNumber(packet[6:10]),
-            'conductivity': bytesToNumber(packet[10:14]),
-            'salinity'    : bytesToNumber(packet[14:18]),
-            'tds'         : bytesToNumber(packet[18:22]),
+            'packetNr': bytesToNumber(packet[0:4]),
+            'reservoir': bytesToNumber(packet[4:6]),
+            'tds': bytesToNumber(packet[6:10]),
+            'waterLevel': bytesToNumber(packet[10:14]),
+            'conductivity': bytesToNumber(packet[14:18]),
+            'salinity': bytesToNumber(packet[18:22]),
+            'pH': bytesToNumber(packet[22:26]),
+            
         }
     except Exception as e:
         print("[main#getPacketComponents] packet with invalid format received: {}".format(e))

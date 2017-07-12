@@ -13,7 +13,7 @@ def _saveToDB (sqlQuery) :
 
     db = MySQLdb.connect(
         host=config.db_host, db=config.db_name, user=config.db_user, passwd=config.db_password)
-    
+    print("[_saveToDB] DEBUG " + sqlQuery)
     cur = db.cursor()
     cur.execute(sqlQuery)
 
@@ -24,7 +24,8 @@ class Measurement () :
     One measurement made by the water sensor
     """
 
-    def __init__ (self, reservoir, pH, waterLevel, conductivity, salinity, tds) :
+    def __init__ (self, packetNr, reservoir, waterLevel, conductivity, salinity, tds, pH) :
+        self.packetNr     = packetNr
         self.reservoir    = reservoir
         self.waterLevel   = waterLevel
         self.pH           = pH
@@ -44,11 +45,13 @@ class Measurement () :
         
         try:
             sqlQuery = """
-            INSERT INTO {} (waterLevel, pH, conductivity, reservoir_id, dateTime, salinity, tds) 
-            VALUES ({}, {}, {}, {}, now())
+            INSERT INTO {} (packetNr, waterLevel, pH, conductivity, reservoir_id, dateTime, salinity, tds) 
+            VALUES ({}, {}, {}, {}, {}, now(), {}, {})
             """.format(
                 config.db_measur_table_name,
-                self.waterLevel, self.pH,
+                self.packetNr,
+                self.waterLevel,
+                self.pH,
                 self.conductivity,
                 self.reservoir,
                 self.salinity,

@@ -1,0 +1,90 @@
+<!--
+    show details of a specific reservoir
+-->
+
+{% extends "main/home_base.html" %}
+{% load static %}
+
+{% block links %}
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/styles_reservoir_info.css' %}">
+    <title>Detalhes Reservatório</title>
+{% endblock %}
+
+{% block content %}
+
+    <header class="mdl-shadow--2dp">
+        <h5 id="reservoir-name">{{ reservoirState.addressName_ }}</h6>
+        <button class="mdl-button mdl-js-button" id="reservoir-link-add-pic">
+            <i class="material-icons">add</i>
+            Adicionar Fotos
+        </button>
+    </header>
+
+    <div class="mdl-grid" id="reservoir-info-section">
+        <div class="mdl-cell mdl-cell--4-col" id="reservoir-info-list">
+            <ul>
+                <li id="reservoir-heigth">
+                    <span class="reservoir-info-val" >Altura: </span>
+                    {{ reservoirState.heigth }} m              
+                </li>
+                <li id="reservoir-width">
+                    <span class="reservoir-info-val" >Largura: </span>
+                    {{ reservoirState.width }} m             
+                </li>
+                <li id="reservoir-length">
+                    <span class="reservoir-info-val" >Comprimento: </span>              
+                    {{ reservoirState.length }} m             
+                </li>
+                <li id="reservoir-total-capacity">
+                    <span class="reservoir-info-val" >Capacidade Máxima: </span>                                        
+                    {{ reservoirState.totalCapacity_ }} m³             
+                </li>
+                {% if reservoirState.lastMeasurement_  %}
+                    <li id="reservoir-current-water-level">
+                        <span class="reservoir-info-val" >Quantidade de Água: </span>
+                        {{ reservoirState.waterLevel_ }} m³
+                    </li>
+                    <li id="reservoir-current-pH">
+                        <span class="reservoir-info-val" >pH: </span>
+                        {{ reservoirState.lastMeasurement_.pH }}
+                    </li>
+                    <li id="reservoir-current-salinity">
+                        <span class="reservoir-info-val" >Salinidade: </span>
+                        {{ reservoirState.lastMeasurement_.salinity }}
+                    </li>
+                    <li id="reservoir-current-conductivity">
+                        <span class="reservoir-info-val" >Condutividade: </span>
+                        {{ reservoirState.lastMeasurement_.conductivity }} S
+                    </li>
+                    <li id="reservoir-current-tds">
+                        <span class="reservoir-info-val" >TDS: </span>
+                        {{ reservoirState.lastMeasurement_.tds }}
+                    </li>
+                {% else %}
+                    <li id="reservoir-current-tds">
+                        <span class="reservoir-info-no-data" >Sem Medições</span>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </div>
+        <div class="mdl-cell mdl-cell--8-col" id="reservoir-animation-section">
+            <canvas id="reservoir-animation"></canvas>
+        </div>
+    </div>
+
+    <div id="reservoir-data-history-section">
+        <!--
+            evolution of water level, pH, salinity, conductivity
+        -->
+    </div>
+
+    <script>
+        window.reservoir    = JSON.parse('{{ reservoir | safe }}')
+        window.measurements = JSON.parse('{{ measurements | safe }}')
+        window.RESERVOIR_WALL = "{% static 'main/img/reservoir_wall.jpg' %}"
+    </script>
+    <script src="{% static 'main/js/three.min.js' %}"></script>    
+    <script src="{% static 'main/js/reservoirAnimation.js' %}"></script>
+
+{% endblock %}

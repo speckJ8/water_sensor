@@ -1,11 +1,14 @@
 from django.shortcuts import render, redirect
-from django.http      import HttpResponse
+from django.http      import HttpResponse, Http404
 from django.template  import loader
 from django.conf      import settings
 
 from django.contrib.auth            import authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models     import User
+from django.forms.models            import model_to_dict
+
+from datetime import datetime
 
 import django.contrib.auth as auth
 import json
@@ -155,4 +158,29 @@ def reservoirList (req) :
         'counties': counties,
         'reservoirs': reservoirs
     }
+    return HttpResponse(template.render(data, req))
+
+
+@login_required(login_url='/login')
+def reservoirDetailedInfo (req) :
+    """
+    Returns detailed information about the a reservoir and today's measurements
+    """
+
+    reservoirId = req.GET['id']
+    try:
+        reservoir = Reservoir.objects.get(res_id=reservoirId)
+        reservoir.setTemplateValues()
+        todaysMeasurements = Measurement.objects.filter(dateTime__day=datetime.now().day).values()
+    except Reservoir.DoesNotExist :
+        print('[reservoirDetailedInfo] data for reservoir %d not found' % (reservoirId))
+        raise Htt404('Dados de reservatório não foram encontrados')
+
+    data = {
+        'reservoirState': reservoir,
+        'reservoir': json.dumps(model_to_dict(reservoir)), # won't contain current waterLevel, etc.
+        'measurements': repr(todaysMeasurements).replace("'", '"')
+    }
+
+    template = loader.get_template('main/reservoir_info.html')
     return HttpResponse(template.render(data, req))
