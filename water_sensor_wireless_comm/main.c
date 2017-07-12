@@ -24,11 +24,8 @@
 
 
 int main (void) {
-    // inicializar a placa
     Board_initGeneral();
     
-    printf("A inicializar BIOS...\n");
     BIOS_start();
-
     return 0;
 }
