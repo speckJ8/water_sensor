@@ -1,7 +1,7 @@
-water_sensor_web_app/static/css/* linguist-vendored
-water_sensor_web_app/static/css/styles_* linguist-vendored=false
-water_sensor_web_app/static/js/* linguist-vendored
-water_sensor_web_app/static/js/ws_* linguist-vendored=false
+water_sensor_web_app/main/static/main/css/* linguist-vendored
+water_sensor_web_app/main/static/main/css/styles_* linguist-vendored=false
+water_sensor_web_app/main/static/main/js/* linguist-vendored
+water_sensor_web_app/main/static/main/js/ws_* linguist-vendored=false
 water_sensor_wireless_comm/.config/* linguist-vendored
 water_sensor_wireless_comm/.launches/* linguist-vendored
 water_sensor_wireless_comm/.settings/* linguist-vendored
