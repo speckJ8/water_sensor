@@ -22,7 +22,11 @@ function InputPipeCurve (scale) {
 InputPipeCurve.prototype = Object.create(THREE.Curve.prototype);
 InputPipeCurve.prototype.constructor = InputPipeCurve;
 
-InputPipeCurve.prototype.getPoint = function (t) {
+/**
+ * Parametric definition of the curve
+ * @param {number} t the parameter
+ */
+InputPipeCurve.prototype.getPoint = (t) => {
 	var tx = t;
 	var ty = -t*t*t*t;
 	var tz = 0;
