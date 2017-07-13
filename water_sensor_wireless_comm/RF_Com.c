@@ -63,7 +63,7 @@ void RFCom_sendPacket (uint8_t *packet, UInt packetSize) {
 int RFCom_receivePacket (uint8_t **packetPtr) {
     if (packetPtr == NULL) {
 #ifdef DEBUG_RF_COM
-        Log_info0("[RFCom_receivePacket] null packetPtr");
+        printf("[RFCom_receivePacket] null packetPtr");
 #endif
     }
 

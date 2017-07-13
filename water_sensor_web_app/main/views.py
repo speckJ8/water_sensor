@@ -171,6 +171,8 @@ def reservoirDetailedInfo (req) :
     try:
         reservoir = Reservoir.objects.get(res_id=reservoirId)
         reservoir.setTemplateValues()
+        inputs  = InputPoint.objects.filter(reservoir_id=reservoir.res_id).values()
+        outputs = OutputPoint.objects.filter(reservoir_id=reservoir.res_id).values()
         todaysMeasurements = Measurement.objects.filter(dateTime__day=datetime.now().day).values()
     except Reservoir.DoesNotExist :
         print('[reservoirDetailedInfo] data for reservoir %d not found' % (reservoirId))
@@ -179,7 +181,9 @@ def reservoirDetailedInfo (req) :
     data = {
         'reservoirState': reservoir,
         'reservoir': json.dumps(model_to_dict(reservoir)), # won't contain current waterLevel, etc.
-        'measurements': repr(todaysMeasurements).replace("'", '"')
+        'measurements': repr(todaysMeasurements).replace("'", '"'),
+        'inputs': repr(inputs).replace("'", '"'),
+        'outputs': repr(outputs).replace("'", '"'),        
     }
 
     template = loader.get_template('main/reservoir_info.html')

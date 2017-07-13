@@ -99,24 +99,25 @@ class Reservoir (models.Model) :
         self.totalCapacity_   = self.totalCapacity()
 
 
-class FlowPoint (models.Model) :
+class InputPoint (models.Model) :
     """
-    A flow point represents either an input or an output point
-    of water into/out of a Reservoir
+    A point of water entry in the reservoir
     """
-
-    ## these are the values 'function' can take
-    Type = Enum('Type', "input output")
 
     # the id of this object
-    flPoint_id = models.AutoField(primary_key=True)
-    # function is either input or output
-    function  = models.CharField(max_length=6)
+    inPoint_id = models.AutoField(primary_key=True)
     # the reservoir it belongs to
     reservoir = models.ForeignKey(Reservoir, on_delete=models.CASCADE)
-    # TODO: put the specific location in the reservoir of this flowpoint
 
+class OutputPoint (models.Model) :
+    """
+    A point of water exit in the reservoir
+    """
 
+    # the id of this object
+    outPoint_id = models.AutoField(primary_key=True)
+    # the reservoir it belongs to
+    reservoir = models.ForeignKey(Reservoir, on_delete=models.CASCADE)
 
 class Measurement (models.Model) :
     """
