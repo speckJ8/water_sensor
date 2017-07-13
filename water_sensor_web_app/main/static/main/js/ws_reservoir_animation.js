@@ -11,7 +11,7 @@ var textureLoader = new THREE.TextureLoader();
 var fontLoader    = new THREE.FontLoader();
 
 /**
- * 
+ * To define the shape of the reservoir input objects
  * @param {number} scale to control the size of the curve
  */
 function InputPipeCurve (scale) {
