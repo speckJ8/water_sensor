@@ -10,16 +10,13 @@ header {
     color: white;
 }
 
-#reservoir-link-add-pic {
-    position: absolute;
-    top: 15px; right: 15px;
+#header-buttons {
+    position: relative;
+    top: 15px; right: 20px;
+}
+#header-buttons button {
     color: white;
 }
-
-#reservoir-link-add-pic i {
-    margin-bottom: 5px;
-} 
-
 
 #reservoir-info-section {
     height: 350px;
@@ -35,6 +32,7 @@ header {
 
 .reservoir-info-val {
     font-weight: bold;
+    font-size: 12pt;
 }
 
 .reservoir-info-no-data {
@@ -48,6 +46,13 @@ header {
     height: 100%;
 }
 
-#reservoir-data-history-section > .mdl-cell {
-    height: 350px;
+#reservoir-data-history-section > .mdl-section { width: 95%; }
+#reservoir-data-history-section > .chart-grid { height: 350px !important; }
+
+
+input[type='date'] {
+    padding: 5px;
+    outline: none;
+    border: none;
+    border-radius: 2px;
 }

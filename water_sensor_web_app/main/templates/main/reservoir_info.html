@@ -15,10 +15,21 @@
 
     <header class="mdl-shadow--2dp">
         <h5 id="reservoir-name">{{ reservoirState.addressName_ }}</h6>
-        <button class="mdl-button mdl-js-button" id="reservoir-link-add-pic">
-            <i class="material-icons">add</i>
-            Adicionar Fotos
-        </button>
+        <div class="mdl-layout-spacer"></div>
+        <div id="header-buttons">
+            <button class="mdl-button mdl-js-button" id="reservoir-link-view-pics">
+                <i class="material-icons">photo_library</i>
+                <div class="mdl-tooltip" data-mdl-for="reservoir-link-view-pics">
+                    Ver fotos deste reservatório
+                </div>
+            </button>
+            <button class="mdl-button mdl-js-button" id="reservoir-link-add-pic">
+                <i class="material-icons">add_a_photo</i>
+                <div class="mdl-tooltip" data-mdl-for="reservoir-link-add-pic">
+                    Adicionar foto deste reservatório
+                </div>
+            </button>
+        </div>
     </header>
 
     <div class="mdl-grid" id="reservoir-info-section">
@@ -26,19 +37,19 @@
             <ul>
                 <li id="reservoir-heigth">
                     <span class="reservoir-info-val" >Altura: </span>
-                    {{ reservoirState.heigth }} m              
+                    {{ reservoirState.heigth }} m
                 </li>
                 <li id="reservoir-width">
                     <span class="reservoir-info-val" >Largura: </span>
-                    {{ reservoirState.width }} m             
+                    {{ reservoirState.width }} m
                 </li>
                 <li id="reservoir-length">
-                    <span class="reservoir-info-val" >Comprimento: </span>              
-                    {{ reservoirState.length }} m             
+                    <span class="reservoir-info-val" >Comprimento: </span>
+                    {{ reservoirState.length }} m
                 </li>
                 <li id="reservoir-total-capacity">
-                    <span class="reservoir-info-val" >Capacidade Máxima: </span>                                        
-                    {{ reservoirState.totalCapacity_ }} m³             
+                    <span class="reservoir-info-val" >Capacidade Máxima: </span>
+                    {{ reservoirState.totalCapacity_ }} m³
                 </li>
                 {% if reservoirState.lastMeasurement_  %}
                     <li id="reservoir-current-water-level">
@@ -51,15 +62,15 @@
                     </li>
                     <li id="reservoir-current-salinity">
                         <span class="reservoir-info-val" >Salinidade: </span>
-                        {{ reservoirState.lastMeasurement_.salinity }}
+                        {{ reservoirState.lastMeasurement_.salinity }} PSI
                     </li>
                     <li id="reservoir-current-conductivity">
                         <span class="reservoir-info-val" >Condutividade: </span>
-                        {{ reservoirState.lastMeasurement_.conductivity }} S/m
+                        {{ reservoirState.lastMeasurement_.conductivity }} µS
                     </li>
                     <li id="reservoir-current-tds">
                         <span class="reservoir-info-val" >TDS: </span>
-                        {{ reservoirState.lastMeasurement_.tds }}
+                        {{ reservoirState.lastMeasurement_.tds }} ppm
                     </li>
                 {% else %}
                     <li id="reservoir-current-tds">
@@ -74,8 +85,26 @@
         </div>
     </div>
 
-    <div id="reservoir-data-history-section" class="mdl-grid">
-        <div class="mdl-cell mdl-cell--12-row" id="reservoir-water-level-chart"></div>
+    <div id="reservoir-data-history-section">
+        <div class="mdl-grid">
+            <div class="mdl-cell mdl-cell--2-col">
+                Dados Desde<input type="date" id="dateFrom" class="mdl-shadow--2dp">
+            </div>
+            <div class="mdl-cell mdl-cell--2-col">
+                Dados Até<input type="date" id="dateUnitl" class="mdl-shadow--2dp">
+            </div>
+        </div>
+        <div class="mdl-grid chart-grid">
+            <div class="mdl-cell mdl-cell--12-col" id="reservoir-water-level-chart"></div>
+        </div>
+        <div class="mdl-grid chart-grid">
+          <div class="mdl-cell mdl-cell--6-col" id="reservoir-salinity-chart"></div>
+          <div class="mdl-cell mdl-cell--6-col" id="reservoir-conductivity-chart"></div>
+        </div>
+        <div class="mdl-grid chart-grid">
+          <div class="mdl-cell mdl-cell--6-col" id="reservoir-pH-chart"></div>
+          <div class="mdl-cell mdl-cell--6-col" id="reservoir-tds-chart"></div>
+        </div>
     </div>
 
     <script>
@@ -90,7 +119,7 @@
         window.RESERVOIR_INFO_PATH = "{% url 'main:measurementData' %}";
     </script>
     <script src="{% static 'main/js/three.min.js' %}"></script>
-    <script src="{% static 'main/js/OrbitControls.js' %}"></script> 
+    <script src="{% static 'main/js/OrbitControls.js' %}"></script>
     <script src="{% static 'main/js/ws_reservoir_animation.js' %}"></script>
     <script src="{% static 'main/js/ws_reservoir_info.js' %}"></script>
 

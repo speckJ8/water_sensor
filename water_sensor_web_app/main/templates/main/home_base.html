@@ -3,16 +3,16 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="{% static 'main/css/material.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'main/css/styles_global.css' %}">    
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/styles_global.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'main/css/styles_home_base.css' %}">
-    <link rel="shortcut icon" type="image/png" href="{% static 'main/img/app_logo.png' %}"/>  
+    <link rel="shortcut icon" type="image/png" href="{% static 'main/img/app_logo.png' %}"/>
     {% block links %} {% endblock %}
     <script src="{% static 'main/js/material.js' %}"></script>
     <link   rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="{% static 'main/js/jquery-3.2.1.js' %}"></script>
     <script src="{% static 'main/js/js.cookie.js' %}"></script>
     <script src="{% static 'main/js/ws_util.js' %}"></script>
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">  
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   </head>
   <body>
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer">
@@ -34,7 +34,7 @@
                     <i class="material-icons nav-link">timeline</i>Estatísticas Globais
                 </a>
                 <a class="mdl-navigation__link main-links" href="{% url 'main:doLogout' %}" id="logout-link" >
-                    <i class="material-icons nav-link">arrow_back</i>Sair
+                    <i class="material-icons nav-link">arrow_back</i>Logout
                 </a>
             </nav>
         </div>
@@ -50,9 +50,9 @@
                         <li><a href="http://www.unicv.edu.cv">UniCV</a></li>
                         </ul>
                     </div>
-                    
+
                     <div class="mdl-mini-footer__right-section">
-                        <div class="mdl-logo" id="copyright">&copy; WellesleyCollege &amp; UniCV</div>        
+                        <div class="mdl-logo" id="copyright">&copy; WellesleyCollege &amp; UniCV</div>
                     </div>
                 </footer>
         </main>
@@ -82,7 +82,7 @@
       <div class="mdl-dialog__content" id="choice-dialog-content"></div>
       <div class="mdl-dialog__actions">
         <button type="button" class="mdl-button" id="choice-dialog-bt-ok">Ok</button>
-        <button type="button" class="mdl-button" id="choice-dialog-bt-cancel">Cancelar</button>        
+        <button type="button" class="mdl-button" id="choice-dialog-bt-cancel">Cancelar</button>
       </div>
     </dialog>
 

@@ -20,7 +20,7 @@ from .models import *
 
 def main (req) :
     """
-    opens the main page or the presentation page if 
+    opens the main page or the presentation page if
     the user is not logged in
     """
 
@@ -42,7 +42,7 @@ def doLogin (req) :
     This function does the actual login verification. It checks the credentials
     and returns error messages or the an ok and saves the user session.
     """
-    
+
     username = req.POST['username']
     password = req.POST['password']
 
@@ -118,11 +118,11 @@ def map (req) :
                 'position': {'lat': p.latitude, 'lng': p.longitude},
                 'address': p.addressName()
             })
-        
-        
+
+
     except Exception as e:
         print("[map] couldn't get data: {}".format(e))
-        
+
     data = {
         'google_maps_key': settings.GOOGLE_MAPS_KEY,
         'reservoirs'     : json.dumps(reservoirs),
@@ -131,7 +131,7 @@ def map (req) :
         'pumpCons'       : repr(pumpCons).replace("'", '"') # change single quoting to double quoting
     }
 
-    template = loader.get_template('main/map.html')    
+    template = loader.get_template('main/map.html')
     return HttpResponse(template.render(data, req))
 
 @login_required(login_url='/login')
@@ -147,7 +147,7 @@ def reservoirList (req) :
         reservoirs = Reservoir.objects.all()
         islands    = reservoirs.order_by().values_list('island', flat=True).distinct()
         counties   = reservoirs.order_by().values_list('county', flat=True).distinct()
-        
+
         for r in reservoirs :
             r.setTemplateValues()
             # get the data from the last measurement from this reservoir
@@ -157,7 +157,7 @@ def reservoirList (req) :
             except Measurement.DoesNotExist :
                 r.lastMeasurement_ = None
                 r.waterVolume_ = 'Sem medições'
-        
+
     except Exception as e:
         print("[reservoirList] couldn't get reservoir data: {}".format(e))
 
@@ -197,8 +197,8 @@ def reservoirDetailedInfo (req) :
     data = {
         'reservoirState': reservoir, # will contain water level info, etc.
         'reservoir': json.dumps(model_to_dict(reservoir)), # won't contain current waterLevel, etc.
-        'inputs': repr(inputs).replace("'", '"'),
-        'outputs': repr(outputs).replace("'", '"'),        
+        'inputs': json.dumps(list(inputs)),
+        'outputs': json.dumps(list(outputs)),
     }
 
     template = loader.get_template('main/reservoir_info.html')
@@ -211,7 +211,7 @@ def measurementData (req) :
     dateFrom   = req.GET['dateFrom']
     dateUntil  = req.GET['dateUnitl']
     clusterBy  = req.GET['clusterBy']
-    
+
     # return JSON values
-    return HttpResponse(str(
-        Measurement.get(data, clusterBy, dateFrom, dateUntil)).replace("'", '"'))
+    measurements = Measurement.get(data, clusterBy, dateFrom, dateUntil)
+    return HttpResponse(json.dumps(list(measurements)))

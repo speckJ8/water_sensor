@@ -1,6 +1,5 @@
 from django.db    import models
 from enum         import Enum
-from datetime     import datetime
 from django.utils import timezone
 
 from .models_conf import *
@@ -46,7 +45,7 @@ class Measurement (models.Model) :
 
         Returns
         -------
-        float      
+        float
         """
 
         return self.waterLevel*self.reservoir.width*self.reservoir.length
@@ -72,20 +71,21 @@ class Measurement (models.Model) :
         QuerySet
         """
 
-        dateNow = datetime.now()
+        dateNow = timezone.now()
         # choose how to group values
-        selectedValues = 'hour'
+        selectedValue = 'hour'
         if clusterBy == 'day' :
-            selectedValues = 'day'
+            selectedValue = 'day'
         elif clusterBy == 'month' :
-            selectedValues = 'day'
+            selectedValue = 'month'
 
-        dtFrom  = datetime.strptime(dateFrom, '%Y-%m-%d').date()
-        dtUnitl = datetime.strptime(dateUntil, '%Y-%m-%d').date()  
+        dtFrom  = timezone.datetime.strptime(dateFrom, '%Y-%m-%d')
+        dtUntil = timezone.datetime.strptime(dateUntil, '%Y-%m-%d')
+        print('from {}; until {}'.format(dtFrom, dtUntil))
         return Measurement.objects \
             .extra(select={'hour': 'hour(dateTime)', 'day': 'day(dateTime)', 'month': 'month(dateTime)'}) \
-            .filter(dateTime__gte=dateFrom, dateTime__lte=dateUntil) \
-            .values(selectedValues) \
+            .values(selectedValue) \
+            .order_by('-' + selectedValue) \
             .annotate(
                 waterLevel=models.Avg('waterLevel'),
                 pH=models.Avg('pH'),

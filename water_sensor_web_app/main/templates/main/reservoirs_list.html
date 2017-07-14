@@ -7,8 +7,8 @@
 
 {% block links %}
     <link rel="stylesheet" type="text/css" href="{% static 'main/css/styles_home_reservoirs.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'main/css/getmdl-select.min.css' %}">    
-    <script src="{% static 'main/js/getmdl-select.min.js' %}"></script>      
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/getmdl-select.min.css' %}">
+    <script src="{% static 'main/js/getmdl-select.min.js' %}"></script>
     <title>Reservatórios</title>
 {% endblock %}
 
@@ -17,7 +17,6 @@
         <div id="filters" class="mdl-shadow--2dp">
             <span>Filtrar Reservatórios</span>
             <div class="mdl-grid">
-
                 <div id="island-filter" class="mdl-cell mdl-cell--2-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
                     <input class="mdl-textfield__input" type="text" id="island" readonly tabIndex="-1">
                     <label for="island">
@@ -56,7 +55,7 @@
                     <div class="mdl-card__supporting-text mdl-cell mdl-cell--9-col">
                         <div class="card-info-val"><strong>Localização: </strong>{{ reservoir.addressName_ }}</div>
                         <div class="card-info-val"><strong>Capacidade Máxima: </strong>{{ reservoir.totalCapacity_ }} m³</div>
-                        <div class="card-info-val"><strong>Quantidade de Água: </strong>{{ reservoir.waterVolume_ }} m³</div>                        
+                        <div class="card-info-val"><strong>Quantidade de Água: </strong>{{ reservoir.waterVolume_ }} m³</div>
                     </div>
                 </div>
                 <div class="mdl-card__actions mdl-card--border">
