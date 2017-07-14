@@ -6,19 +6,6 @@ import MySQLdb
 import config
 
 
-def _saveToDB (sqlQuery) :
-    # This opens and closes the connections to the database.
-    # Since writings occur only every 10 minutes it wouldn't be efficient to
-    # let the connection open.
-
-    db = MySQLdb.connect(
-        host=config.db_host, db=config.db_name, user=config.db_user, passwd=config.db_password)
-    print("[_saveToDB] DEBUG " + sqlQuery)
-    cur = db.cursor()
-    cur.execute(sqlQuery)
-
-    db.close()
-
 class Measurement () :
     """
     One measurement made by the water sensor
@@ -44,19 +31,34 @@ class Measurement () :
         """
         
         try:
+            # This opens and closes the connections to the database.
+            # Since writings occur only every 10 minutes it wouldn't be efficient to
+            # let the connection open.
+            db = MySQLdb.connect(
+                host=config.db_host, db=config.db_name, user=config.db_user, passwd=config.db_password)
+            cur = db.cursor()            
+
+            # get the reservoir height to be able to measure the water level
+            sqlQuery = "SELECT heigth FROM main_reservoir WHERE res_id = {}".format(self.reservoir)
+            cur.execute(sqlQuery)
+            # self.waterLevel is the height of the part of the reservoir
+            # that's out of water. that value minus height will give the actual water level
+            waterLevel = cur.fetchone()[0] - self.waterLevel
+
             sqlQuery = """
-            INSERT INTO {} (packetNr, waterLevel, pH, conductivity, reservoir_id, dateTime, salinity, tds) 
+            INSERT INTO main_measurement (packetNr, waterLevel, pH, conductivity, reservoir_id, dateTime, salinity, tds) 
             VALUES ({}, {}, {}, {}, {}, now(), {}, {})
             """.format(
-                config.db_measur_table_name,
                 self.packetNr,
-                self.waterLevel,
+                waterLevel,
                 self.pH,
                 self.conductivity,
                 self.reservoir,
                 self.salinity,
                 self.tds)
+            cur.execute(sqlQuery)
 
-            _saveToDB(sqlQuery)
+            db.commit()
+            db.close()
         except Exception as e:
             print('[Measurement#save] failed to save instance: {}'.format(e))

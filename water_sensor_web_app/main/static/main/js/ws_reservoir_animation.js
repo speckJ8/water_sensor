@@ -104,7 +104,7 @@ var main = () => {
 
   /* create the 'water inside' object */
   // the height of the part of the reservoir without water
-  var waterGap = 2; // TODO: get real value
+  waterGap = reservoir.heigth - reservoir.waterLevel;
   var wiMat  = new THREE.MeshPhongMaterial({ color: 0x142286 });
   var waterTexture = textureLoader.load(WATER_TEXTURE);
   waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping;

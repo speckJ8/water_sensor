@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^home$', views.home, name='home'),
     url(r'^map$', views.map, name='map'),
     url(r'^reservoir-detailed-info$', views.reservoirDetailedInfo, name='reservoirDetailedInfo'),
-    url(r'^reservoir-list', views.reservoirList, name='reservoirList'),
+    url(r'^reservoir-list$', views.reservoirList, name='reservoirList'),
+    url(r'^measurement-data$', views.measurementData, name="measurementData"),
     url(r'^$', views.main, name='main'),
 ]

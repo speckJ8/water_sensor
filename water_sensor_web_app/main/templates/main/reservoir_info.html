@@ -7,6 +7,7 @@
 
 {% block links %}
     <link rel="stylesheet" type="text/css" href="{% static 'main/css/styles_reservoir_info.css' %}">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <title>Detalhes Reservatório</title>
 {% endblock %}
 
@@ -42,7 +43,7 @@
                 {% if reservoirState.lastMeasurement_  %}
                     <li id="reservoir-current-water-level">
                         <span class="reservoir-info-val" >Quantidade de Água: </span>
-                        {{ reservoirState.waterLevel_ }} m³
+                        {{ reservoirState.waterVolume_ }} m³
                     </li>
                     <li id="reservoir-current-pH">
                         <span class="reservoir-info-val" >pH: </span>
@@ -54,7 +55,7 @@
                     </li>
                     <li id="reservoir-current-conductivity">
                         <span class="reservoir-info-val" >Condutividade: </span>
-                        {{ reservoirState.lastMeasurement_.conductivity }} S
+                        {{ reservoirState.lastMeasurement_.conductivity }} S/m
                     </li>
                     <li id="reservoir-current-tds">
                         <span class="reservoir-info-val" >TDS: </span>
@@ -73,23 +74,24 @@
         </div>
     </div>
 
-    <div id="reservoir-data-history-section">
-        <!--
-            evolution of water level, pH, salinity, conductivity
-        -->
+    <div id="reservoir-data-history-section" class="mdl-grid">
+        <div class="mdl-cell mdl-cell--12-row" id="reservoir-water-level-chart"></div>
     </div>
 
     <script>
-        window.reservoir    = JSON.parse('{{ reservoir | safe }}')
-        window.measurements = JSON.parse('{{ measurements | safe }}')
-        window.reservoirInputs  = JSON.parse('{{ inputs | safe }}')
-        window.reservoirOutputs = JSON.parse('{{ outputs | safe }}')        
-        window.RESERVOIR_WALL = "{% static 'main/img/reservoir_wall.jpg' %}"
-        window.WATER_TEXTURE  = "{% static 'main/img/water_texture.jpg' %}"
-        window.AXIS_TEXT_FONT = "{% static 'main/gentilis_regular.typeface.json' %}"
+        window.reservoir    = JSON.parse('{{ reservoir | safe }}');
+        window.reservoir.waterLevel = {{ reservoirState.lastMeasurement_.waterLevel | safe }};
+        // window.measurements = JSON.parse('{{ measurements | safe }}');
+        window.reservoirInputs  = JSON.parse('{{ inputs | safe }}');
+        window.reservoirOutputs = JSON.parse('{{ outputs | safe }}');
+        window.RESERVOIR_WALL = "{% static 'main/img/reservoir_wall.jpg' %}";
+        window.WATER_TEXTURE  = "{% static 'main/img/water_texture.jpg' %}";
+        window.AXIS_TEXT_FONT = "{% static 'main/gentilis_regular.typeface.json' %}";
+        window.RESERVOIR_INFO_PATH = "{% url 'main:measurementData' %}";
     </script>
     <script src="{% static 'main/js/three.min.js' %}"></script>
     <script src="{% static 'main/js/OrbitControls.js' %}"></script> 
     <script src="{% static 'main/js/ws_reservoir_animation.js' %}"></script>
+    <script src="{% static 'main/js/ws_reservoir_info.js' %}"></script>
 
 {% endblock %}

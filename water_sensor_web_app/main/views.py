@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models     import User
 from django.forms.models            import model_to_dict
 
+from django.core.exceptions         import FieldError
+
 from datetime import datetime
 
 import django.contrib.auth as auth
@@ -148,6 +150,13 @@ def reservoirList (req) :
         
         for r in reservoirs :
             r.setTemplateValues()
+            # get the data from the last measurement from this reservoir
+            try :
+                r.lastMeasurement_ = Measurement.objects.filter(reservoir_id=r.res_id).latest('dateTime')
+                r.waterVolume_     = lastMeasurement_.waterVolume()
+            except Measurement.DoesNotExist :
+                r.lastMeasurement_ = None
+                r.waterVolume_ = 'Sem medições'
         
     except Exception as e:
         print("[reservoirList] couldn't get reservoir data: {}".format(e))
@@ -171,20 +180,38 @@ def reservoirDetailedInfo (req) :
     try:
         reservoir = Reservoir.objects.get(res_id=reservoirId)
         reservoir.setTemplateValues()
+        # get the data from the last measurement from this reservoir
+        try :
+            reservoir.lastMeasurement_ = Measurement.objects.filter(
+                reservoir_id=reservoir.res_id).latest('dateTime')
+            reservoir.waterVolume_     = '{:.2f}'.format(reservoir.lastMeasurement_.waterVolume())
+        except Measurement.DoesNotExist :
+            reservoir.lastMeasurement_ = None
+            reservoir.waterVolume_ = 'Sem medições'
         inputs  = InputPoint.objects.filter(reservoir_id=reservoir.res_id).values()
         outputs = OutputPoint.objects.filter(reservoir_id=reservoir.res_id).values()
-        todaysMeasurements = Measurement.objects.filter(dateTime__day=datetime.now().day).values()
-    except Reservoir.DoesNotExist :
-        print('[reservoirDetailedInfo] data for reservoir %d not found' % (reservoirId))
+    except Reservoir.DoesNotExist as e:
+        print('[reservoirDetailedInfo] data for reservoir {} not found: {}'.format(reservoirId, e))
         raise Htt404('Dados de reservatório não foram encontrados')
 
     data = {
-        'reservoirState': reservoir,
+        'reservoirState': reservoir, # will contain water level info, etc.
         'reservoir': json.dumps(model_to_dict(reservoir)), # won't contain current waterLevel, etc.
-        'measurements': repr(todaysMeasurements).replace("'", '"'),
         'inputs': repr(inputs).replace("'", '"'),
         'outputs': repr(outputs).replace("'", '"'),        
     }
 
     template = loader.get_template('main/reservoir_info.html')
     return HttpResponse(template.render(data, req))
+
+
+@login_required(login_url='/login')
+def measurementData (req) :
+    data       = req.GET['data']
+    dateFrom   = req.GET['dateFrom']
+    dateUntil  = req.GET['dateUnitl']
+    clusterBy  = req.GET['clusterBy']
+    
+    # return JSON values
+    return HttpResponse(str(
+        Measurement.get(data, clusterBy, dateFrom, dateUntil)).replace("'", '"'))
