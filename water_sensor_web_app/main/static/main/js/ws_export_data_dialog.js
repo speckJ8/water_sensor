@@ -58,7 +58,7 @@ $(document).ready(() => {
     }
 
     /**
-     * Downloads the reservoir measurement data to an Excel compatible format (csv or xls)
+     * Downloads the reservoir measurement data
      */
     exportData = (format) => {
         var url = EXPORT_DATA_PATH + "?format=" + format;
@@ -88,7 +88,7 @@ $(document).ready(() => {
     }
 
     /**
-     * Set the choice on all reservoirs
+     * Set the choice to export data of all reservoirs
      */
     checkAll = () => {
         for (var r in currentReservoirs) {
