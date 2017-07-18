@@ -52,16 +52,18 @@ class Measurement (models.Model) :
 
     ## TODO: get only the attributes specified in data
     ## TODO: at this point everything is being retrieved
-    def get (data, clusterBy, dateFrom, dateUntil) :
+    def get (reservoirs, data, clusterBy, dateFrom, dateUntil) :
         """
         Returns a set of measurements filtered by 'dataFilter'.
 
         Parameters
         ----------
+        reservoirs: int
+            The reservoirs to get measurements. If it is 'all' or '' every reservoir will be considered.
         data: str
             Specifies the attribute to read. If it is 'all' or '' every attribute will be read.
-        clusterBy: str
-            Indicates if the date should be grouped (and avereged) by hour, day or month
+        clusterBy: [str]
+            Indicates how to distinguish the data (by hours, days(averages), months(averages))
         dateFrom: str
             Measurements should have dateTime value after, or at, this date
         dateUntil: str
@@ -71,24 +73,29 @@ class Measurement (models.Model) :
         QuerySet
         """
 
-        dateNow = timezone.now()
         # choose how to group values
-        selectedValue = 'hour'
-        if clusterBy == 'day' :
-            selectedValue = 'day'
-        elif clusterBy == 'month' :
-            selectedValue = 'month'
+        selectedValues =  clusterBy.split(',')
 
         dtFrom  = timezone.datetime.strptime(dateFrom, '%Y-%m-%d')
         dtUntil = timezone.datetime.strptime(dateUntil, '%Y-%m-%d')
-        print('from {}; until {}'.format(dtFrom, dtUntil))
-        return Measurement.objects \
-            .extra(select={'hour': 'hour(dateTime)', 'day': 'day(dateTime)', 'month': 'month(dateTime)'}) \
-            .values(selectedValue) \
-            .order_by('-' + selectedValue) \
+
+        measurements =  Measurement.objects \
+            .extra(select={'hour': 'hour(dateTime)', 'day': 'day(dateTime)',
+                           'month': 'month(dateTime)', 'year': 'year(dateTime)'}) \
+            .filter(dateTime__gt=dtFrom, dateTime__lte=dtUntil)
+
+        if reservoirs != 'all' :
+            reservoirsAccpeted = reservoirs.split(',')
+            measurements = measurements.filter(reservoir__res_id__in=reservoirsAccpeted)
+
+        measurements = measurements.order_by(*selectedValues) \
+            .values(*selectedValues) \
             .annotate(
                 waterLevel=models.Avg('waterLevel'),
                 pH=models.Avg('pH'),
                 conductivity=models.Avg('conductivity'),
                 salinity=models.Avg('salinity'),
                 tds=models.Avg('tds'))
+
+        return measurements
+        

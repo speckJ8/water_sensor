@@ -7,6 +7,7 @@
 
 {% block links %}
     <link rel="stylesheet" type="text/css" href="{% static 'main/css/styles_reservoir_info.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/styles_reservoir_data_export_dialog.css' %}">    
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <title>Detalhes Reservatório</title>
 {% endblock %}
@@ -17,6 +18,12 @@
         <h5 id="reservoir-name">{{ reservoirState.addressName_ }}</h6>
         <div class="mdl-layout-spacer"></div>
         <div id="header-buttons">
+            <button class="mdl-button mdl-js-button" id="reservoir-link-export-data">
+                <i class="material-icons">file_download</i>
+                <div class="mdl-tooltip" data-mdl-for="reservoir-link-export-data">
+                    Exportar Dados
+                </div>
+            </button>
             <button class="mdl-button mdl-js-button" id="reservoir-link-view-pics">
                 <i class="material-icons">photo_library</i>
                 <div class="mdl-tooltip" data-mdl-for="reservoir-link-view-pics">
@@ -86,12 +93,24 @@
     </div>
 
     <div id="reservoir-data-history-section">
-        <div class="mdl-grid">
+        <div class="mdl-grid mdl-js-grid">
             <div class="mdl-cell mdl-cell--2-col">
                 Dados Desde<input type="date" id="dateFrom" class="mdl-shadow--2dp">
             </div>
             <div class="mdl-cell mdl-cell--2-col">
-                Dados Até<input type="date" id="dateUnitl" class="mdl-shadow--2dp">
+                Dados Até<input type="date" id="dateUntil" class="mdl-shadow--2dp">
+            </div>
+            <div id="xDimField" class="mdl-cell mdl-cell--2-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fix-height">
+                <input class="mdl-textfield__input" type="text" id="xDim" readonly tabIndex="-1">
+                <label for="xDim">
+                    <i class="mdl-icon-toggle__label material-icons">keyboard_arrow_down</i>
+                </label>
+                <label for="xDim" class="mdl-textfield__label">Dimensão do eixo X</label>
+                <ul for="xDim" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                    <li class="mdl-menu__item" data-val="hour" id="xDim_hour">Horas</li>
+                    <li class="mdl-menu__item" data-val="day" id="xDim_day">Dias</li>
+                    <li class="mdl-menu__item" data-val="month" id="xDim_month">Meses</li>                        
+                </ul>
             </div>
         </div>
         <div class="mdl-grid chart-grid">
@@ -107,8 +126,12 @@
         </div>
     </div>
 
+
+    {% include 'main/reservoir_data_export_dialog.html' %}
+
     <script>
         window.reservoir    = JSON.parse('{{ reservoir | safe }}');
+        window.reservoirPics = {{ pictures | safe }};
         window.reservoir.waterLevel = {{ reservoirState.lastMeasurement_.waterLevel | safe }};
         // window.measurements = JSON.parse('{{ measurements | safe }}');
         window.reservoirInputs  = JSON.parse('{{ inputs | safe }}');
@@ -121,6 +144,9 @@
     <script src="{% static 'main/js/three.min.js' %}"></script>
     <script src="{% static 'main/js/OrbitControls.js' %}"></script>
     <script src="{% static 'main/js/ws_reservoir_animation.js' %}"></script>
+    <script src="{% static 'main/js/moment.js' %}"></script>
     <script src="{% static 'main/js/ws_reservoir_info.js' %}"></script>
+    <script src="{% static 'main/js/ws_export_data_dialog.js' %}"></script>
+    
 
 {% endblock %}

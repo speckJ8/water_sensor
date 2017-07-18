@@ -1,7 +1,7 @@
 #map-search-field {
     position: absolute;
     width: 40%;
-    left: 30%; 
+    left: 30%;
     top: 10px;
     border: 0 solid white;
     border-radius: 2px;
@@ -9,6 +9,7 @@
     background: white;
     height: 40px;
     z-index: 1; /* to be above the map */
+    display: inline-flex;
 }
 
 #map-search {
@@ -22,9 +23,30 @@
     border-radius: 2px;
 }
 
+#map-search-bt {
+    width: 10%;
+    padding-top: 7px;
+    padding-left: 13px;
+    position: relative;
+}
+
+#map-search-bt:hover {
+    cursor: pointer;
+    background: rgba(200, 200, 200, 0.2);
+}
+
 
 #map {
     margin: 0;
     width: 100%;
     height: 100vh;
+}
+
+#map-reservoir-search-results {
+    width: 40%;
+    position: absolute;
+    top: 50px;
+    left: 30%;
+    border-radius: 2px;
+    z-index: 1;
 }

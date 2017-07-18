@@ -54,8 +54,8 @@ class Reservoir (models.Model) :
         str
         """
 
-        return "{}, {}, {}, @({}, {})".format(
-                self.town, self.county, self.island, self.latitude, self.longitude)
+        return "{}, {}, {}, @({:.4f}, {:.4f}), #{}".format(
+                self.town, self.county, self.island, self.latitude, self.longitude, self.res_id)
 
 
     def mainPic (self) :
@@ -64,7 +64,7 @@ class Reservoir (models.Model) :
 
         Returns
         -------
-        string
+        str
             the path to the picture
         """
 
@@ -74,6 +74,26 @@ class Reservoir (models.Model) :
             return '/static/main/img/reservoir_pics/' + str(self.res_id) + '_0'
         else:
             return '/static/main/img/reservoir_pics/stub'
+
+    def allPics (self) :
+        """
+        Returns a list of paths to this reservoir pictures
+
+        Returns
+        -------
+        [str]
+            the list of paths
+        """
+
+        picIdx = 0
+        pic = '{}{}_{}'.format(Reservoir.RES_PICS_PATH, self.res_id, picIdx)
+        pictures = []
+        while path.isfile(pic) :
+            pictures.append('/static/main/img/reservoir_pics/{}_{}'.format(self.res_id, picIdx))
+            picIdx += 1
+            pic = '{}{}_{}'.format(Reservoir.RES_PICS_PATH, self.res_id, picIdx)
+
+        return pictures
 
     def setTemplateValues (self) :
         """

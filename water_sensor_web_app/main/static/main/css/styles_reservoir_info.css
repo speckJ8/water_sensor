@@ -56,3 +56,9 @@ input[type='date'] {
     border: none;
     border-radius: 2px;
 }
+
+#xDimField {
+    display: inline-flex;
+    max-width: none !important;
+    width: 200px !important;
+}

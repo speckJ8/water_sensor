@@ -1,6 +1,8 @@
 (() => {
 
     var locationSantiagoIsland = { lat: 15.082677, lng: -23.6210796 }
+    var mapConnections = []; // connections between items in the map
+    var searchField = document.getElementById('map-search');
 
     /**
      * @param {integer} id the id of the reservoir to search
@@ -30,12 +32,21 @@
             center: locationSantiagoIsland
         });
 
+        // load the data for the first time
+        loadData();
+    }
+
+    /**
+     * To layout the data in the mapa
+     */
+    window.loadData = () => {
+
         // add the pump and reservoir markers to the map
         for (var i = 0; i < window.reservoirs.length; i++)
             addReservoirToMap(window.reservoirs[i]);
         for (var i = 0; i < window.pumps.length; i++)
             addPumpToMap(window.pumps[i]);
-        
+
         // add the connections between the reservoirs
         for (var i = 0; i < window.reservoirCons.length; i++) {
             var con = window.reservoirCons[i];
@@ -50,7 +61,7 @@
             var res = findReservoirById(con.reservoir__res_id);
             var pmp = findPumpById(con.pump__pump_id);
             if (res !== undefined && pmp !== undefined)
-                addConnectionToMap(res.marker, pmp.marker, 1);            
+                addConnectionToMap(res.marker, pmp.marker, 1);
         }
     }
 
@@ -87,11 +98,11 @@
     }
 
     /**
-     * Removes all current markers from the map
+     * Removes all current markers and connections from the map
      */
-    window.removeMarkers = () => {
+    window.removeItemsFromMap = () => {
         var i = window.reservoirs.length;
-        while (i-- >= 0) {
+        while (i-- > 0) {
             // remove from map and from array
             window.reservoirs[i].marker.setMap(null);
             window.reservoirs.splice(i ,1);
@@ -102,6 +113,13 @@
             // remove from map and from array
             window.pumps[i].marker.setMap(null);
             window.pumps.splice(i, 1);
+        }
+
+        i = mapConnections.length;
+        while (i-- > 0) {
+            // remove from map and from array
+            mapConnections[i].setMap(null);
+            mapConnections.splice(i, 1);
         }
     }
 
@@ -139,6 +157,36 @@
         }
 
         line.setMap(window.myMap);
+        mapConnections.push(line);
     }
+
+    /**
+     * Search pumps and reservois according the locations in the search box
+     */
+    window.searchMap = () => {
+        var searchText = searchField.value;
+        var url = MAP_PATH + "?region=" + searchText + "&res-type=json";
+        $.get(url)
+        .done((results) => {
+            var jsonRes   = JSON.parse(results);
+
+            // remove existing items
+            removeItemsFromMap();
+            
+            reservoirs    = jsonRes.reservoirs;
+            reservoirCons = jsonRes.reservoirCons;
+            pumps         = jsonRes.pumps;
+            pumpCons      = jsonRes.pumpCons;
+
+            loadData();
+        })
+        .fail(() => {
+            Util.showErroMsg('Não foi possivel obter os dados. Verifique a sua conexão á internet');
+        })
+    }
+
+    /* set the map search callback */
+    // document.getElementById('map-search-bt').onclick = searchMap;
+    searchField.onkeyup = searchMap;
 
 })();

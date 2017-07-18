@@ -2,68 +2,116 @@ $(document).ready(() => {
 
     /* to specify the range of data to read */
     var fromField = document.getElementById('dateFrom');
-    var untilField = document.getElementById('dateUnitl');
+    var untilField = document.getElementById('dateUntil');
+    var xDimField = document.getElementById('xDim');
 
-    var waterLevelChart,
-        waterLevelChartOptions = {
-            chart: {
-                title: 'Altura do nível de água no reservatório',
-                subtitle: 'em metros (m)'
+    
+    // chart specific data
+    var chartParameters = {
+        'waterLevel': {
+            'chartOptions': {
+                chart: {
+                    title: 'Altura do nível de água no reservatório',
+                    subtitle: 'em metros (m)'
+                },
+                colors: ['blue']
             },
-            colors: ['blue']
+            'chartDesc': 'Altura da Água'
+        }, 
+        'pH': {
+            'chartOptions': {
+                chart: { title: 'pH da Água' },
+                colors: ['green']
+            },
+            'chartDesc': 'pH'
+        }, 
+        'salinity': {
+            'chartOptions': {
+                chart: {
+                    title: 'Salinidade da Água',
+                    subtitle: 'em gramas de sal por kilogramas de água (PSU)'
+                },
+                colors: ['#808080']
+            },
+            'chartDesc': 'Salinidade'
+        },
+        'conductivity': {
+            'chartOptions': {
+                chart: {
+                    title: 'Condutividade da Água',
+                    subtitle: 'em micro Siemens (µS)'
+                },
+                colors: ['orange']
+            },
+            'chartDesc': 'Condutividade'
+        },
+        'tds': {
+            'chartOptions': {
+                chart: {
+                    title: 'Total de Sólidos Disolvidos na Água',
+                    subtitle: 'em partes por millão (ppm)'
+                },
+                colors: ['#423f38']
+            },
+            'chartDesc': 'TDS'
+        }
     }
-
-    var salinityChart,
-        salinityChartOptions = {
-            chart: {
-                title: 'Salinidade da Água',
-                subtitle: 'em gramas de sal por kilogramas de água (PSU)'
-            },
-            colors: ['#808080']
-        }
-
-    var conductivityChart,
-        conductivityChartOptions = {
-            chart: {
-                title: 'Condutividade da Água',
-                subtitle: 'em micro Siemens (µS)'
-            },
-            colors: ['orange']
-        }
-
-    var pHChart,
-        pHChartOptions = {
-            chart: {
-                title: 'pH da Água'
-            },
-            colors: ['green']
-        }
-
-    var tdsChart,
-        tdsChartOptions = {
-            chart: {
-                title: 'Total de Sólidos Disolvidos na Água',
-                subtitle: 'em partes por millão (ppm)'
-            },
-            colors: ['#423f38']
-        }
-
 
     /**
      * To load the data into the charts
      */
     loadChartsValues = () => {
+        
+        // TODO: define the grouping (done)
+        // TODO: data export options
+        // TODO: load pictures and browse pictures
+        // TODO: filter data in map and reservoir list
+        
         var from  = fromField.value;
         var until = untilField.value;
+        var dateFrom  = moment(from);
+        var dateUntil = moment(until);
 
-        var grouping = 'hour';
-        // TODO: define the grouping
+        if (!dateFrom.isValid() || !dateUntil.isValid()) {
+            Util.showMsgDialog('Datas', 'Formato de datas inválido. Utilize o formato mês/dia/ano');
+            return;
+        }
 
-        drawChart('waterLevel', grouping, from, until);
-        drawChart('salinity', grouping, from, until);
-        drawChart('conductivity', grouping, from, until);
-        drawChart('pH', grouping, from, until);
-        drawChart('tds', grouping, from, until);
+        // choose how to group data (by hour, day or month)
+        duration = moment.duration(dateUntil.diff(dateFrom));
+        var grouping;
+        if (duration.years() == 0 && duration.months() == 0 && duration.days() <= 1) {
+            document.getElementById('xDim_hour').hidden = false;
+            document.getElementById('xDim_day').hidden = true;
+            document.getElementById('xDim_month').hidden = true;
+
+            grouping = 'day,hour';            
+            if (xDimField.value != 'Horas')
+                xDimField.value = 'Horas';
+        }
+        else if (duration.years() == 0 && duration.months() <= 1) {
+            document.getElementById('xDim_hour').hidden = false;
+            document.getElementById('xDim_day').hidden = false;
+            document.getElementById('xDim_month').hidden = true;
+
+            grouping = 'month,day';
+            if (xDimField.value == 'Horas')
+                grouping += ',hour';
+            else xDimField.value = 'Dias'
+        }
+        else {
+            document.getElementById('xDim_hour').hidden = true;
+            document.getElementById('xDim_day').hidden = false;
+            document.getElementById('xDim_month').hidden = false;
+
+            grouping = 'year,month';
+            if (xDimField.value == 'Dias')
+                grouping += ',day';
+            else  xDimField.value = 'Meses';
+        }
+            
+
+        drawChart(grouping, from, until);
     }
 
     /**
@@ -71,15 +119,15 @@ $(document).ready(() => {
      */
     drawCharts = () => {
 
-        waterLevelChart = new google.charts.Line(
+        chartParameters['waterLevel'].chart = new google.charts.Line(
             document.getElementById('reservoir-water-level-chart'));
-        salinityChart = new google.charts.Line(
+        chartParameters['salinity'].chart = new google.charts.Line(
             document.getElementById('reservoir-salinity-chart'));
-        conductivityChart = new google.charts.Line(
+        chartParameters['conductivity'].chart = new google.charts.Line(
             document.getElementById('reservoir-conductivity-chart'));
-        pHChart = new google.charts.Line(
+        chartParameters['pH'].chart = new google.charts.Line(
             document.getElementById('reservoir-pH-chart'));
-        tdsChart = new google.charts.Line(
+        chartParameters['tds'].chart = new google.charts.Line(
             document.getElementById('reservoir-tds-chart'));
 
         var today = new Date();
@@ -92,8 +140,9 @@ $(document).ready(() => {
         untilField.value = today.getFullYear() + '-' +
             (today.getMonth() > 8 ? (today.getMonth()+1) : "0" + (today.getMonth()+1)) + '-' +
             (today.getDate() > 9 ? today.getDate() : "0" + today.getDate());;
+
         // for when the values change
-        fromField.onchange = untilField.onchange = loadChartsValues;
+        fromField.onchange = untilField.onchange = xDimField.onchange = loadChartsValues;
 
         // load chart values for the first time
         loadChartsValues();
@@ -101,74 +150,55 @@ $(document).ready(() => {
 
     /**
      * Draw new data in a chart
-     * @param {string} data the type of data to get (pH or salinity ...)
      * @param {string} clusterBy how to group the data (by hour, day or month)
      * @param {string} from all the measurements should be after this date. Format yyyy-mm-dd
      * @param {string} until all the measurements should be before this date. Format yyyy-mm-dd
      */
-    drawChart = (data, clusterBy, from, until) => {
-        var url = RESERVOIR_INFO_PATH + "?data=" + data +
+    drawChart = (clusterBy, from, until) => {
+        var url = RESERVOIR_INFO_PATH + "?data=all" +
+            "&res_id=" + window.reservoir.res_id +
             "&dateFrom=" + from + "&dateUnitl=" + until +
             "&clusterBy=" + clusterBy;
 
         $.get(url)
         .done((result) => {
 
-            jsonRes = JSON.parse(result); // should be a list of measurements
+            var jsonRes = JSON.parse(result); // should be a list of measurements
 
-            var chartData = new google.visualization.DataTable();
-            // x axis label according to the grouping
-            if (clusterBy == 'day')
-                chartData.addColumn('number', 'Dia');
-            else if (clusterBy == 'month')
-                chartData.addColumn('number', 'Mês');
-            else
-                chartData.addColumn('number', 'Hora');
+            for (var data in chartParameters) {
 
-            var chartToDraw;
-            var options;
-            var desc;
+                var chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', '');
+                
+                console.log(`data=${data} and params=${chartParameters[data]}`)
+                var chartToDraw = chartParameters[data]['chart'];
+                var options = chartParameters[data]['chartOptions'];
+                var desc = chartParameters[data]['chartDesc'];
 
-            switch (data) {
-            case 'waterLevel':
-                desc = 'Altura';
-                chartToDraw = waterLevelChart;
-                options = waterLevelChartOptions;
-                break;
-            case 'salinity':
-                desc = 'Salinidade';
-                chartToDraw = salinityChart;
-                options = salinityChartOptions;
-                break;
-            case 'conductivity' :
-                desc = 'Condutividade';
-                chartToDraw = conductivityChart;
-                options = conductivityChartOptions;
-                break;
-            case 'pH' :
-                desc = 'pH';
-                chartToDraw = pHChart;
-                options = pHChartOptions;
-                break;
-            case 'tds' :
-                desc = 'TDS';
-                chartToDraw = tdsChart;
-                options = tdsChartOptions;
-                break;
-            default:
-                Util.showMsgDialog('Gráfico', 'Tipo de dados desconhecido');
-                return;
+                chartData.addColumn('number', desc);
+                var xLabelParts = clusterBy.split(',');
+
+                console.log(`${jsonRes.length} results for ${data}`);
+                for (var m in jsonRes) {
+                    var measurement = jsonRes[m];
+                    var xVal = '';
+                    // set the x label as the date of the measurement
+                    for (var p in xLabelParts) {
+                        var lp = xLabelParts[p];
+                        if (lp == 'month')
+                            xVal += moment.monthsShort(measurement[lp]-1) + ', ';
+                        else if (lp == 'hour')
+                            xVal += measurement[lp] + ':00, '
+                        else
+                            xVal += measurement[lp] + ', ';
+                    }
+                    // remove the last 2 characters
+                    xVal = xVal.substr(0, xVal.length-2);
+                    chartData.addRow([xVal, measurement[data]]);
+                }
+
+                chartToDraw.draw(chartData, google.charts.Line.convertOptions(options));
             }
-
-            chartData.addColumn('number', desc);
-
-            for (var m in jsonRes) {
-                var measurement = jsonRes[m];
-                chartData.addRow([measurement[clusterBy], measurement[data]]);
-                console.log('x_val = ' + measurement[clusterBy]);
-            }
-
-            chartToDraw.draw(chartData, google.charts.Line.convertOptions(options));
 
         })
         .fail(() => {
@@ -179,5 +209,4 @@ $(document).ready(() => {
     /* load google charts API */
     google.charts.load('current', { 'packages': ['line'] });
     google.charts.setOnLoadCallback(drawCharts);
-
 });
