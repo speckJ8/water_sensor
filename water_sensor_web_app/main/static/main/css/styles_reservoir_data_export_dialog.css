@@ -24,3 +24,8 @@
 #export-data-reservoir-list .mdl-checkbox {
     margin-left:  10px;
 }
+
+#export-data-reservoir-list li {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}

@@ -226,6 +226,7 @@ def reservoirDetailedInfo (req) :
     try:
         reservoir = Reservoir.objects.get(res_id=reservoirId)
         reservoir.setTemplateValues()
+        reservoir.totalCapacity_   = '{:.2f}'.format(reservoir.totalCapacity_)        
         # get the data from the last measurement from this reservoir
         try :
             reservoir.lastMeasurement_ = Measurement.objects.filter(

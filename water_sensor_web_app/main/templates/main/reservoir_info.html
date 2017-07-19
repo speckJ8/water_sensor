@@ -132,7 +132,11 @@
     <script>
         window.reservoir    = JSON.parse('{{ reservoir | safe }}');
         window.reservoirPics = {{ pictures | safe }};
-        window.reservoir.waterLevel = {{ reservoirState.lastMeasurement_.waterLevel | safe }};
+        {% if reservoirState.lastMeasurement_ %}
+            window.reservoir.waterLevel = {{ reservoirState.lastMeasurement_.waterLevel | safe }};
+        {% else %}
+            window.reservoir.waterLevel = 0;
+        {% endif %}
         // window.measurements = JSON.parse('{{ measurements | safe }}');
         window.reservoirInputs  = JSON.parse('{{ inputs | safe }}');
         window.reservoirOutputs = JSON.parse('{{ outputs | safe }}');

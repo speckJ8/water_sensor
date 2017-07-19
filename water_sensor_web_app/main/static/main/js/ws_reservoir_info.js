@@ -62,18 +62,13 @@ $(document).ready(() => {
      */
     loadChartsValues = () => {
         
-        // TODO: define the grouping (done)
-        // TODO: data export options
-        // TODO: load pictures and browse pictures
-        // TODO: filter data in map and reservoir list
-        
         var from  = fromField.value;
         var until = untilField.value;
         var dateFrom  = moment(from);
         var dateUntil = moment(until);
 
         if (!dateFrom.isValid() || !dateUntil.isValid()) {
-            Util.showMsgDialog('Datas', 'Formato de datas inválido. Utilize o formato mês/dia/ano');
+            Util.showMsgDialog('Datas', 'Formato de datas inválido. Utilize o formato ano-mês-dia');
             return;
         }
 
@@ -134,12 +129,8 @@ $(document).ready(() => {
         var yesterday = new Date(today.getTime() - 25*60*60*1000);
 
         // initially load only today's data
-        fromField.value  = yesterday.getFullYear() + '-' +
-            (yesterday.getMonth() > 8 ? (yesterday.getMonth()+1) : "0" + (yesterday.getMonth()+1)) + '-' +
-            (yesterday.getDate() > 9 ? yesterday.getDate() : "0" + yesterday.getDate());;
-        untilField.value = today.getFullYear() + '-' +
-            (today.getMonth() > 8 ? (today.getMonth()+1) : "0" + (today.getMonth()+1)) + '-' +
-            (today.getDate() > 9 ? today.getDate() : "0" + today.getDate());;
+        fromField.value  = moment(yesterday).format('YYYY-MM-DD');
+        untilField.value = moment(today).format('YYYY-MM-DD');
 
         // for when the values change
         fromField.onchange = untilField.onchange = xDimField.onchange = loadChartsValues;
@@ -170,7 +161,6 @@ $(document).ready(() => {
                 var chartData = new google.visualization.DataTable();
                 chartData.addColumn('string', '');
                 
-                console.log(`data=${data} and params=${chartParameters[data]}`)
                 var chartToDraw = chartParameters[data]['chart'];
                 var options = chartParameters[data]['chartOptions'];
                 var desc = chartParameters[data]['chartDesc'];
@@ -178,7 +168,6 @@ $(document).ready(() => {
                 chartData.addColumn('number', desc);
                 var xLabelParts = clusterBy.split(',');
 
-                console.log(`${jsonRes.length} results for ${data}`);
                 for (var m in jsonRes) {
                     var measurement = jsonRes[m];
                     var xVal = '';

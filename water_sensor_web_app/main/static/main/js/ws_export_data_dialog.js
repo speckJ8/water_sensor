@@ -8,7 +8,7 @@ $(document).ready(() => {
     var dialogXLSBt = document.getElementById('export-data-bt-xls');
     var cbCheckAll  = document.getElementById('export-data-reservoir-list-all');
     // reservoirs currently shown in the dialog
-    var currentReservoirs = []; 
+    var currentReservoirs = [];
 
     /**
      * Called when the export data button is called.
@@ -19,30 +19,37 @@ $(document).ready(() => {
             var jsonRes = JSON.parse(result);
 
             // remove current children from reservoir list
-            reservoirsList.innerHTML = "";
+            while (reservoirsList.firstChild)
+                reservoirsList.removeChild(reservoirsList.firstChild);
+            
             // clear currentReservoirs list
             for (var r in currentReservoirs)
                 currentReservoirs.splice(r, 1);
 
             for (var r in jsonRes) {
-                // create new list element and add to table
                 var reservoir = jsonRes[r];
-                // check if it is the reservoir that's currently being shown
-                var checkedOrUnchecked = 
-                    reservoir.res_id == window.reservoir.res_id ? 'checked' : 'unchecked';
-                reservoirsList.innerHTML +=
-                `<li class="mdl-list__item">
-                    <span class="mdl-list__item-primary-content">
-                    ${reservoir.town}, ${reservoir.county}, ${reservoir.island}, #${reservoir.res_id}
-                    </span>
-                    <span class="mdl-list__item-secondary-action">
-                    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" 
-                           for="export-data-reservoir-list-${reservoir.res_id}">
-                        <input type="checkbox" id="export-data-reservoir-list-${reservoir.res_id}" 
-                               class="mdl-checkbox__input" ${checkedOrUnchecked} />
-                    </label>
-                    </span>
-                </li>`;
+
+                // create new list element and add to table
+                reservoir.cb = document.createElement('input');
+                reservoir.cb.type = "checkbox"; reservoir.cb.id = `export-data-reservoir-list-${reservoir.res_id}`;
+                reservoir.cb.className = "mdl-checkbox__input";
+                reservoir.cb.checked = reservoir.res_id == window.reservoir.res_id;
+                var li = document.createElement('li');
+                li.className = "mdl-list__item";
+                var span1 = document.createElement('span');
+                span1.className = "mdl-list__item-primary-content";
+                span1.innerHTML = `${reservoir.town}, ${reservoir.county},` + 
+                    ` ${reservoir.island}, #${reservoir.res_id}`;
+                var span2 = document.createElement('span');
+                span2.className = "mdl-list__item-secondary-action";
+                var label = document.createElement('label');
+                label.className = "mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect";
+                label.for = `export-data-reservoir-list-${reservoir.res_id}`;
+                li.appendChild(span1);
+                label.appendChild(reservoir.cb);
+                span2.appendChild(label);
+                li.appendChild(span2);
+                reservoirsList.appendChild(li);
 
                 currentReservoirs.push(reservoir);
             }
@@ -67,16 +74,20 @@ $(document).ready(() => {
         var dateUntil = untilField.value;
 
         if (!moment(dateFrom).isValid() || !moment(dateUntil).isValid()) {
-            Util.showMsgDialog('Datas', 'Formato de datas inválido. Utilize o formato mês/dia/ano');
+            Util.showMsgDialog('Datas', 'Formato de datas inválido. Utilize o formato ano-mês-dia');
             return;
         }
 
         url += `&dateFrom=${dateFrom}&dateUntil=${dateUntil}`;
 
         for (var r in currentReservoirs) {
-            var resId = currentReservoirs[r].res_id;
-            if (document.getElementById('export-data-reservoir-list-' + resId).checked)
+            if (currentReservoirs[r].cb.checked)
                 reservoirsChosen += resId + ",";
+        }
+
+        if (reservoirsChosen == '') {
+            Util.showErrorDialog('Tens que escolher pelo menos um reservatório');
+            return;
         }
 
         url += "&reservoirs=" + reservoirsChosen.substr(0, reservoirsChosen.length-1);
@@ -92,10 +103,8 @@ $(document).ready(() => {
      */
     checkAll = () => {
         for (var r in currentReservoirs) {
-            var resId = currentReservoirs[r].res_id;
-            document.getElementById('export-data-reservoir-list-' + resId).checked = cbCheckAll.checked;
+            currentReservoirs[r].cb.checked = cbCheckAll.checked;
         }
-        dialogCSVBt.disabled = dialogXLSBt.disabled = !cbCheckAll.checked;
     }
 
     /* set callbacks for buttons */
@@ -103,5 +112,5 @@ $(document).ready(() => {
     document.getElementById('export-data-bt-cancel').onclick = () => exportDataDialog.close();
     dialogXLSBt.onclick = () => exportData('xls');
     dialogCSVBt.onclick = () => exportData('csv');
-    cbCheckAll.onchange = checkAll;
+    cbCheckAll.onclick = checkAll;
 })

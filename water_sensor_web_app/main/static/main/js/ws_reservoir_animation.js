@@ -10,27 +10,20 @@ var controls    = null; // to rotate and zoom the scene
 var textureLoader = new THREE.TextureLoader();
 var fontLoader    = new THREE.FontLoader();
 
-/**
- * To define the shape of the reservoir input objects
- * @param {number} scale to control the size of the curve
- */
-function InputPipeCurve (scale) {
-	THREE.Curve.call(this);
-	this.scale = (scale === undefined) ? 1 : scale;
+
+function InputPipeCurve() {
+  THREE.Curve.call(this);  
 }
 
 InputPipeCurve.prototype = Object.create(THREE.Curve.prototype);
 InputPipeCurve.prototype.constructor = InputPipeCurve;
 
-/**
- * Parametric definition of the curve
- * @param {number} t the parameter
- */
-InputPipeCurve.prototype.getPoint = (t) => {
-	var tx = t;
-	var ty = -t*t*t*t;
-	var tz = 0;
-	return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
+InputPipeCurve.prototype.getPoint = function (t) {
+    var tx = 0.2*t;
+    var ty = Math.cos(2*Math.PI*t);
+    var tz = 0;
+
+    return new THREE.Vector3(0, tx, 0);
 };
 
 
@@ -77,10 +70,6 @@ var main = () => {
 
   /* create the controls to move the scene */
   controls = new THREE.OrbitControls(camera, renderer.domElement);
-  //controls.addEventListener('change', run);
-  //controls.target = new THREE.Vector3(0, 0, 0);
-  //controls.enableDamping = true;
-  //controls.dampingFactor = 0.0001;
   controls.enableZoom = true;
   controls.enableRotate = true;
 
@@ -124,8 +113,8 @@ var main = () => {
 
   /* show  outputs of the reservoir */
   var output = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.3, 0.2, 0.4, 10, 10),
-    new THREE.MeshPhongMaterial({ color: 0x504040 })
+    new THREE.CylinderGeometry(0.25, 0.2, 0.4, 20, 10),
+    new THREE.MeshPhongMaterial({ color: 0x200505 })
   );
   var outOffset = reservoir.width / reservoirOutputs.length; // distance between outputs
   for (var i = 0; i < reservoirOutputs.length; i++) {
@@ -142,16 +131,17 @@ var main = () => {
 
   /* show the inputs of the reservoir */
   var input = new THREE.Mesh(
-    new THREE.TubeGeometry(new InputPipeCurve(0.6), 20, 0.2, 10, true),
-    new THREE.MeshPhongMaterial({ color: 0x301010 })    
+    new THREE.TubeGeometry(new InputPipeCurve(), 20, 0.2, 20, true),
+    // new THREE.CylinderGeometry(0.25, 0.2, 0.4, 20, 10),
+    new THREE.MeshBasicMaterial({ color: 0x200505 })
   );
   var inOffset = reservoir.width / reservoirInputs.length; // distance between inputs
   for (var i = 0; i < reservoirInputs.length; i++) {
     var in_ = input.clone();
     // at the begginig of the reservoir
-    in_.position.z = resOb.position.z - reservoir.length/2; + 0.5;
+    in_.position.z = resOb.position.z - reservoir.length/2 + 0.5;
     // at the top of the reservoir
-    in_.position.y = resOb.position.y + reservoir.heigth/2 + 0.5;
+    in_.position.y = resOb.position.y + reservoir.heigth/2;
     // displacement in the roof
     in_.position.x = i*inOffset + inOffset/2 - reservoir.width/2;
     in_.rotation.y = -Math.PI/2;
